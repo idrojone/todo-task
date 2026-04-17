@@ -1,7 +1,7 @@
 services:
   mongodb:
-    image: mongo:latest
-    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    image: ${MONGODB_IMAGE:-mongo:latest}
+    command: ["mongod", "--replSet", "${REPL_SET_NAME:-rs0}", "--bind_ip_all"]
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "mongosh --eval \"db.adminCommand({ping:1})\" >/dev/null 2>&1 || exit 1"]
@@ -15,7 +15,7 @@ services:
       - mongodb_data:/data/db
 
   mongo-init-replica:
-    image: mongo:latest
+    image: ${MONGODB_IMAGE:-mongo:latest}
     depends_on:
       - mongodb
     entrypoint: ["bash", "/scripts/init-replica.sh"]
@@ -24,7 +24,7 @@ services:
       - ./scripts:/scripts
     environment:
       MONGO_HOST: mongodb:27017
-      REPL_SET_NAME: rs0
+      REPL_SET_NAME: ${REPL_SET_NAME:-rs0}
 
   app:
     build: .
@@ -32,7 +32,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_MONGODB_URI: "mongodb://mongodb:27017/task_db?replicaSet=rs0"
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+      - SPRING_MONGODB_URI=${SPRING_MONGODB_URI}
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_SERVER_PORT=${SPRING_SERVER_PORT}
+      - JAVA_OPTS=${JAVA_OPTS}
     depends_on:
       mongodb:
         condition: service_healthy

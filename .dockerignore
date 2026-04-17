@@ -1,0 +1,8 @@
+# ignore build artifacts and local files
+target
+.idea
+.vscode
+.git
+.gitignore
+*.md
+*.log
