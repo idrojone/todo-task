@@ -1,0 +1,46 @@
+services:
+  mongodb:
+    image: mongo:latest
+    command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --eval \"db.adminCommand({ping:1})\" >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  mongo-init-replica:
+    image: mongo:latest
+    depends_on:
+      - mongodb
+    entrypoint: ["bash", "/scripts/init-replica.sh"]
+    restart: on-failure
+    volumes:
+      - ./scripts:/scripts
+    environment:
+      MONGO_HOST: mongodb:27017
+      REPL_SET_NAME: rs0
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_MONGODB_URI: "mongodb://mongodb:27017/task_db?replicaSet=rs0"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mongo-init-replica:
+        condition: service_completed_successfully
+        
+volumes:
+  mongodb_data:
+networks:
+  default:
+    name: task-api_default
