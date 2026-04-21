@@ -30,7 +30,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "8080:8080"
+      - "8082:8082"
     environment:
       - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
       - SPRING_MONGODB_URI=${SPRING_MONGODB_URI}
