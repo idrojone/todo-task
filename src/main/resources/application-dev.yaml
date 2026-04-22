@@ -1,0 +1,37 @@
+# ============================================================
+# DEV Profile — Local con Hot Reload
+# ============================================================
+# Puerto 8082 para evitar colisión con api-gateway (8080) y auth-service (8081)
+
+server:
+  port: 8082
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/task_db
+
+  graphql:
+    graphiql:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.springframework.graphql: DEBUG
+    me.idrojone.task: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always

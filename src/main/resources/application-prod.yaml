@@ -1,0 +1,38 @@
+# ============================================================
+# PROD Profile — Docker Network
+# ============================================================
+# Puerto 8082 para evitar colisión con api-gateway (8080) y auth-service (8081)
+
+spring:
+  # Excluir auto-config de seguridad que genera passwords
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.UserDetailsServiceAutoConfiguration
+  devtools:
+    restart:
+      enabled: false
+
+  data:
+    mongodb:
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://mongodb:27017/task_db}
+
+  graphql:
+    graphiql:
+      enabled: false
+
+server:
+  port: 8082
+
+logging:
+  level:
+    root: WARN
+    org.springframework.graphql: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized

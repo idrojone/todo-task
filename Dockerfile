@@ -22,5 +22,5 @@ RUN chown appuser:appgroup /app/app.jar
 USER appuser
 
 ENV JAVA_OPTS=""
-EXPOSE 8080
+EXPOSE 8082
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
